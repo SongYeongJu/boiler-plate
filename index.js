@@ -2,16 +2,11 @@ const express = require('express')
 const app = express()
 const port = 3000
 
-app.get('/', (req, res) => {
-  res.send('Hello World! It\'s yeongju')
-})
-
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`)
-})
+const {mongoURI} = require('./config/dev')
+const config = require('./config/key');
 
 const mongoose = require('mongoose');
-mongoose.connect('mongodb+srv://song:test@boiler-plate.luohi.mongodb.net/myFirstDatabase?retryWrites=true&w=majority', {
+mongoose.connect(config.mongoURI, {
     useNewUrlParser : true, 
     useUnifiedTopology: true, 
     useCreateIndex : true, 
@@ -20,48 +15,33 @@ mongoose.connect('mongodb+srv://song:test@boiler-plate.luohi.mongodb.net/myFirst
 }).then(() => console.log('MongoDB connected...'))
 .catch(err => console.log(err));
 
-const Schema = mongoose.Schema
+const bodyParser = require('body-parser');
+const {User} = require('./models/User');
+const { json } = require('body-parser');
 
-const userSchema = mongoose.Schema({
-    name : {
-        type : String,
-        maxlength : 50,
-    },
-    email : {
-        type : String, 
-        trim : true, // no space
-        unique : 1,
-    },
-    password : {
-        type : String, 
-        maxlength : 50,
-    },
-    role : {
-        type : Number,
-        default : 0,
-    },
-    image : String,
-    token : {
-        type : String
-    },
-    tokenExp : {
-        type : Number,
-    },
+// application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({extended : true}))
+
+// application/json
+app.use(bodyParser.json())
+
+app.get('/', (req, res) => {
+  res.send('Hello World! It\'s yeongju~~')
 })
 
-const User = mongoose.model('User', userSchema)
-module.exports = { User }
-const productSchema = mongoose.Schema({
-    writer : {
-        type : Schema.Types.ObjectId,
-        ref : 'User',
-    },
-    title : {
-        type : String,
-        maxlength : 50,
-    },
-    description : {
-        type : String,
-    },
-}, { timestamps : true })
+app.listen(port, () => {
+  console.log(`Example app listening at http://localhost:${port}`)
+})
+
+app.post('/register', (req, res) => {
+    const user = new User(req.body)
+
+    user.save((err, userInfo) => {
+        if(err) return res.json({success : false, err})
+        return res.status(200).json({
+            success : true
+        })
+    })
+
+})
 

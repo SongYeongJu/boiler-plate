@@ -1,9 +1,9 @@
-import React from 'react'
+import React, {useEffect } from 'react'
 import axios from 'axios'
 
 function LandingPage() {
     useEffect(() => {
-        axios.get('/api/hello')
+        axios.get('http://localhost:5000/api/hello')
         .then(response => console.log(response.data))
     })
     return (
@@ -11,4 +11,4 @@ function LandingPage() {
     )
 }
 
-export default LandingPage
+export default LandingPage;
